@@ -5,3 +5,15 @@ channel-artifacts/
 __pycache__/
 *.pyc
 .env
+
+# Gateway
+gateway/node_modules/
+gateway/.env
+
+# Network artifacts (generated — not committed)
+network/crypto-config/
+network/channel-artifacts/
+network/bin/
+
+# Explorer build
+explorer/dist/

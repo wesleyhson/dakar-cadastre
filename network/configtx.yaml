@@ -1,43 +1,91 @@
 ---
 Organizations:
+  - &OrdererOrg
+    Name: OrdererMSP
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/dakar.sn/msp
+    Policies:
+      Readers: { Type: Signature, Rule: "OR('OrdererMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('OrdererMSP.member')" }
+      Admins:  { Type: Signature, Rule: "OR('OrdererMSP.admin')" }
+    OrdererEndpoints:
+      - orderer.dakar.sn:7050
+
   - &Municipality
     Name: MunicipalityMSP
     ID: MunicipalityMSP
     MSPDir: crypto-config/peerOrganizations/municipality.dakar.sn/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('MunicipalityMSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('MunicipalityMSP.member')" }
+      Readers: { Type: Signature, Rule: "OR('MunicipalityMSP.admin','MunicipalityMSP.peer','MunicipalityMSP.client')" }
+      Writers: { Type: Signature, Rule: "OR('MunicipalityMSP.admin','MunicipalityMSP.client')" }
       Admins:  { Type: Signature, Rule: "OR('MunicipalityMSP.admin')" }
+      Endorsement: { Type: Signature, Rule: "OR('MunicipalityMSP.peer')" }
+    AnchorPeers:
+      - Host: peer0.municipality.dakar.sn
+        Port: 7051
 
   - &NationalRevenue
     Name: NationalRevenueMSP
     ID: NationalRevenueMSP
     MSPDir: crypto-config/peerOrganizations/revenue.gouv.sn/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('NationalRevenueMSP.member')" }
-      Writers: { Type: Signature, Rule: "OR('NationalRevenueMSP.member')" }
+      Readers: { Type: Signature, Rule: "OR('NationalRevenueMSP.admin','NationalRevenueMSP.peer','NationalRevenueMSP.client')" }
+      Writers: { Type: Signature, Rule: "OR('NationalRevenueMSP.admin','NationalRevenueMSP.client')" }
       Admins:  { Type: Signature, Rule: "OR('NationalRevenueMSP.admin')" }
+      Endorsement: { Type: Signature, Rule: "OR('NationalRevenueMSP.peer')" }
+    AnchorPeers:
+      - Host: peer0.revenue.gouv.sn
+        Port: 8051
 
   - &CivilSociety
     Name: CivilSocietyMSP
     ID: CivilSocietyMSP
     MSPDir: crypto-config/peerOrganizations/observer.dakar.sn/msp
     Policies:
-      Readers: { Type: Signature, Rule: "OR('CivilSocietyMSP.member')" }
+      Readers: { Type: Signature, Rule: "OR('CivilSocietyMSP.admin','CivilSocietyMSP.peer','CivilSocietyMSP.client')" }
       Writers: { Type: Signature, Rule: "OR('CivilSocietyMSP.admin')" }
       Admins:  { Type: Signature, Rule: "OR('CivilSocietyMSP.admin')" }
+      Endorsement: { Type: Signature, Rule: "OR('CivilSocietyMSP.peer')" }
+    AnchorPeers:
+      - Host: peer0.observer.dakar.sn
+        Port: 9051
 
 Capabilities:
   Channel: &ChannelCapabilities { V2_0: true }
   Orderer: &OrdererCapabilities { V2_0: true }
-  Application: &ApplicationCapabilities { V2_0: true }
+  Application: &ApplicationCapabilities { V2_5: true }
 
-Application: &ApplicationDefaults
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer.dakar.sn:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  EtcdRaft:
+    Consenters:
+      - Host: orderer.dakar.sn
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/tls/server.crt
   Organizations:
   Policies:
     Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
     Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
     Admins:  { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
+    BlockValidation: { Type: ImplicitMeta, Rule: "ANY Writers" }
+  Capabilities: *OrdererCapabilities
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:     { Type: ImplicitMeta, Rule: "ANY Readers" }
+    Writers:     { Type: ImplicitMeta, Rule: "ANY Writers" }
+    Admins:      { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
+    LifecycleEndorsement: { Type: ImplicitMeta, Rule: "MAJORITY Endorsement" }
+    Endorsement: { Type: ImplicitMeta, Rule: "MAJORITY Endorsement" }
   Capabilities: *ApplicationCapabilities
 
 Channel: &ChannelDefaults
@@ -48,22 +96,16 @@ Channel: &ChannelDefaults
   Capabilities: *ChannelCapabilities
 
 Profiles:
-  DakarCadastreGenesis:
+  # Used with: configtxgen -profile DakarCadastreChannel -outputBlock channel-artifacts/dakar-cadastre.block -channelID dakar-cadastre
+  DakarCadastreChannel:
     <<: *ChannelDefaults
     Orderer:
-      OrdererType: etcdraft
-      Addresses: [orderer.dakar.sn:7050]
-      EtcdRaft:
-        Consenters:
-          - Host: orderer.dakar.sn
-            Port: 7050
-            ClientTLSCert: crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/tls/server.crt
-            ServerTLSCert: crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/tls/server.crt
-      Organizations: [*Municipality]
-      Capabilities: *OrdererCapabilities
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
     Application:
       <<: *ApplicationDefaults
-      Organizations: [*Municipality, *NationalRevenue, *CivilSociety]
-    Consortiums:
-      DakarConsortium:
-        Organizations: [*Municipality, *NationalRevenue, *CivilSociety]
+      Organizations:
+        - *Municipality
+        - *NationalRevenue
+        - *CivilSociety

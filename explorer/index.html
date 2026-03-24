@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dakar Cadastre — Public Explorer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">Dakar Cadastre</span>
+        <span class="logo-sub">Public Ledger Explorer</span>
+      </div>
+      <nav class="nav">
+        <a href="#" class="nav-link active" data-page="dashboard">Dashboard</a>
+        <a href="#" class="nav-link" data-page="properties">Properties</a>
+        <a href="#" class="nav-link" data-page="disbursements">Disbursements</a>
+        <a href="#" class="nav-link" data-page="zones">Zones</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- Dashboard -->
+    <section id="page-dashboard" class="page active">
+      <div class="page-header">
+        <h1>Fiscal Overview</h1>
+        <p class="page-sub">All data is read directly from the Hyperledger Fabric ledger — immutable, publicly auditable.</p>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Registered Properties</div>
+          <div class="stat-value" id="stat-properties">—</div>
+          <div class="stat-hint">buildings on the ledger</div>
+        </div>
+        <div class="stat-card accent-green">
+          <div class="stat-label">Tax Collected <span id="stat-year-label"></span></div>
+          <div class="stat-value" id="stat-collected">—</div>
+          <div class="stat-hint">CFA francs</div>
+        </div>
+        <div class="stat-card accent-blue">
+          <div class="stat-label">Disbursed <span id="stat-year-label2"></span></div>
+          <div class="stat-value" id="stat-disbursed">—</div>
+          <div class="stat-hint">CFA francs spent</div>
+        </div>
+        <div class="stat-card accent-amber">
+          <div class="stat-label">Compliance Rate</div>
+          <div class="stat-value" id="stat-compliance">—</div>
+          <div class="stat-hint">properties paid this year</div>
+        </div>
+      </div>
+
+      <div class="row-2col">
+        <div class="panel">
+          <div class="panel-title">Disbursements by Category</div>
+          <canvas id="chart-disburse" height="200"></canvas>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Tax Revenue by Zone Class</div>
+          <canvas id="chart-zones" height="200"></canvas>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Recent Transactions</div>
+        <div id="recent-list" class="tx-list"></div>
+      </div>
+    </section>
+
+    <!-- Properties -->
+    <section id="page-properties" class="page">
+      <div class="page-header">
+        <h1>Property Registry</h1>
+        <div class="search-row">
+          <input id="prop-search" class="search-input" placeholder="Search by ID or owner name…" />
+          <input id="prop-zone-filter" class="search-input" placeholder="Filter by H3 zone (last 10 chars)…" style="width:240px" />
+        </div>
+      </div>
+      <div id="prop-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Building ID</th>
+              <th>Owner</th>
+              <th>Use Type</th>
+              <th>Zone Class</th>
+              <th>Assessed Value</th>
+              <th>Tax Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="prop-table-body">
+            <tr><td colspan="7" class="loading-cell">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Disbursements -->
+    <section id="page-disbursements" class="page">
+      <div class="page-header">
+        <h1>Municipal Disbursements</h1>
+        <p class="page-sub">Every franc of tax revenue spent is recorded on-chain with an evidence hash. Citizens can verify independently.</p>
+        <div class="search-row">
+          <select id="disb-year" class="search-input" style="width:120px">
+            <option value="">All years</option>
+          </select>
+          <select id="disb-category" class="search-input" style="width:180px">
+            <option value="">All categories</option>
+            <option value="infrastructure">Infrastructure</option>
+            <option value="sanitation">Sanitation</option>
+            <option value="education">Education</option>
+            <option value="health">Health</option>
+            <option value="administration">Administration</option>
+            <option value="emergency">Emergency</option>
+          </select>
+        </div>
+      </div>
+      <div id="disb-list" class="disb-list"></div>
+    </section>
+
+    <!-- Zones -->
+    <section id="page-zones" class="page">
+      <div class="page-header">
+        <h1>Zone Registry</h1>
+        <p class="page-sub">H3-9 cell zone classifications, base tax rates, and use multipliers.</p>
+      </div>
+      <div id="zones-grid" class="zones-grid"></div>
+    </section>
+  </main>
+
+  <!-- Property detail modal -->
+  <div id="modal" class="modal-overlay hidden">
+    <div class="modal">
+      <button class="modal-close" id="modal-close">✕</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
