@@ -36,16 +36,12 @@ services:
       - ORDERER_GENERAL_CLUSTER_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
       - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
       - ORDERER_CHANNELPARTICIPATION_ENABLED=true
-      - ORDERER_ADMIN_TLS_ENABLED=true
-      - ORDERER_ADMIN_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
-      - ORDERER_ADMIN_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
-      - ORDERER_ADMIN_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
-      - ORDERER_ADMIN_TLS_CLIENTROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      - ORDERER_ADMIN_TLS_ENABLED=false
       - ORDERER_ADMIN_LISTENADDRESS=0.0.0.0:7053
       - ORDERER_OPERATIONS_LISTENADDRESS=0.0.0.0:17050
     volumes:
-      - ../crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/msp:/var/hyperledger/orderer/msp
-      - ../crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/tls:/var/hyperledger/orderer/tls
+      - ./crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/tls:/var/hyperledger/orderer/tls
       - orderer.dakar.sn:/var/hyperledger/production/orderer
     ports:
       - "7050:7050"
@@ -82,8 +78,8 @@ services:
       - CORE_PEER_GATEWAY_ENABLED=true
     volumes:
       - /var/run/docker.sock:/host/var/run/docker.sock
-      - ../crypto-config/peerOrganizations/municipality.dakar.sn/peers/peer0.municipality.dakar.sn/msp:/etc/hyperledger/fabric/msp
-      - ../crypto-config/peerOrganizations/municipality.dakar.sn/peers/peer0.municipality.dakar.sn/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/peerOrganizations/municipality.dakar.sn/peers/peer0.municipality.dakar.sn/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/municipality.dakar.sn/peers/peer0.municipality.dakar.sn/tls:/etc/hyperledger/fabric/tls
       - peer0.municipality.dakar.sn:/var/hyperledger/production
     ports:
       - "7051:7051"
@@ -118,8 +114,8 @@ services:
       - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:18051
     volumes:
       - /var/run/docker.sock:/host/var/run/docker.sock
-      - ../crypto-config/peerOrganizations/municipality.dakar.sn/peers/peer1.municipality.dakar.sn/msp:/etc/hyperledger/fabric/msp
-      - ../crypto-config/peerOrganizations/municipality.dakar.sn/peers/peer1.municipality.dakar.sn/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/peerOrganizations/municipality.dakar.sn/peers/peer1.municipality.dakar.sn/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/municipality.dakar.sn/peers/peer1.municipality.dakar.sn/tls:/etc/hyperledger/fabric/tls
       - peer1.municipality.dakar.sn:/var/hyperledger/production
     ports:
       - "8051:8051"
@@ -153,8 +149,8 @@ services:
       - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:19051
     volumes:
       - /var/run/docker.sock:/host/var/run/docker.sock
-      - ../crypto-config/peerOrganizations/revenue.gouv.sn/peers/peer0.revenue.gouv.sn/msp:/etc/hyperledger/fabric/msp
-      - ../crypto-config/peerOrganizations/revenue.gouv.sn/peers/peer0.revenue.gouv.sn/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/peerOrganizations/revenue.gouv.sn/peers/peer0.revenue.gouv.sn/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/revenue.gouv.sn/peers/peer0.revenue.gouv.sn/tls:/etc/hyperledger/fabric/tls
       - peer0.revenue.gouv.sn:/var/hyperledger/production
     ports:
       - "9051:9051"
@@ -188,8 +184,8 @@ services:
       - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:20051
     volumes:
       - /var/run/docker.sock:/host/var/run/docker.sock
-      - ../crypto-config/peerOrganizations/observer.dakar.sn/peers/peer0.observer.dakar.sn/msp:/etc/hyperledger/fabric/msp
-      - ../crypto-config/peerOrganizations/observer.dakar.sn/peers/peer0.observer.dakar.sn/tls:/etc/hyperledger/fabric/tls
+      - ./crypto-config/peerOrganizations/observer.dakar.sn/peers/peer0.observer.dakar.sn/msp:/etc/hyperledger/fabric/msp
+      - ./crypto-config/peerOrganizations/observer.dakar.sn/peers/peer0.observer.dakar.sn/tls:/etc/hyperledger/fabric/tls
       - peer0.observer.dakar.sn:/var/hyperledger/production
     ports:
       - "10051:10051"
