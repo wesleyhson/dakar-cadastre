@@ -1,0 +1,24 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: dakar.sn
+    Specs:
+      - Hostname: orderer
+
+PeerOrgs:
+  - Name: Municipality
+    Domain: municipality.dakar.sn
+    EnableNodeOUs: true
+    Template: { Count: 2 }
+    Users: { Count: 3 }   # admin, assessor, collector
+
+  - Name: NationalRevenue
+    Domain: revenue.gouv.sn
+    EnableNodeOUs: true
+    Template: { Count: 1 }
+    Users: { Count: 2 }   # admin, auditor
+
+  - Name: CivilSociety
+    Domain: observer.dakar.sn
+    EnableNodeOUs: true
+    Template: { Count: 1 }
+    Users: { Count: 1 }   # observer (read-only)

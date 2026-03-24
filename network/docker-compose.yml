@@ -1,0 +1,75 @@
+version: '3.7'
+
+networks:
+  dakar_net:
+
+services:
+  orderer.dakar.sn:
+    image: hyperledger/fabric-orderer:2.5
+    environment:
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_BOOTSTRAPMETHOD=none
+      - ORDERER_CHANNELPARTICIPATION_ENABLED=true
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - FABRIC_LOGGING_SPEC=INFO
+    ports: ["7050:7050", "7053:7053"]
+    networks: [dakar_net]
+
+  peer0.municipality.dakar.sn:
+    image: hyperledger/fabric-peer:2.5
+    environment:
+      - CORE_PEER_ID=peer0.municipality.dakar.sn
+      - CORE_PEER_ADDRESS=peer0.municipality.dakar.sn:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_LOCALMSPID=MunicipalityMSP
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:5984
+      - FABRIC_LOGGING_SPEC=INFO
+    ports: ["7051:7051"]
+    depends_on: [couchdb0]
+    networks: [dakar_net]
+
+  peer0.revenue.gouv.sn:
+    image: hyperledger/fabric-peer:2.5
+    environment:
+      - CORE_PEER_ID=peer0.revenue.gouv.sn
+      - CORE_PEER_ADDRESS=peer0.revenue.gouv.sn:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_LOCALMSPID=NationalRevenueMSP
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1:5984
+      - FABRIC_LOGGING_SPEC=INFO
+    ports: ["8051:8051"]
+    depends_on: [couchdb1]
+    networks: [dakar_net]
+
+  peer0.observer.dakar.sn:
+    image: hyperledger/fabric-peer:2.5
+    environment:
+      - CORE_PEER_ID=peer0.observer.dakar.sn
+      - CORE_PEER_ADDRESS=peer0.observer.dakar.sn:9051
+      - CORE_PEER_LOCALMSPID=CivilSocietyMSP
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb2:5984
+      - FABRIC_LOGGING_SPEC=INFO
+    ports: ["9051:9051"]
+    depends_on: [couchdb2]
+    networks: [dakar_net]
+
+  couchdb0:
+    image: couchdb:3.3.2
+    environment: [COUCHDB_USER=admin, COUCHDB_PASSWORD=adminpw]
+    ports: ["5984:5984"]
+    networks: [dakar_net]
+
+  couchdb1:
+    image: couchdb:3.3.2
+    environment: [COUCHDB_USER=admin, COUCHDB_PASSWORD=adminpw]
+    ports: ["6984:5984"]
+    networks: [dakar_net]
+
+  couchdb2:
+    image: couchdb:3.3.2
+    environment: [COUCHDB_USER=admin, COUCHDB_PASSWORD=adminpw]
+    ports: ["7984:5984"]
+    networks: [dakar_net]

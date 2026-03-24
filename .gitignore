@@ -1,0 +1,7 @@
+crypto-config/
+channel-artifacts/
+*.pb
+*.block
+__pycache__/
+*.pyc
+.env

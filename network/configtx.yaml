@@ -1,0 +1,69 @@
+---
+Organizations:
+  - &Municipality
+    Name: MunicipalityMSP
+    ID: MunicipalityMSP
+    MSPDir: crypto-config/peerOrganizations/municipality.dakar.sn/msp
+    Policies:
+      Readers: { Type: Signature, Rule: "OR('MunicipalityMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('MunicipalityMSP.member')" }
+      Admins:  { Type: Signature, Rule: "OR('MunicipalityMSP.admin')" }
+
+  - &NationalRevenue
+    Name: NationalRevenueMSP
+    ID: NationalRevenueMSP
+    MSPDir: crypto-config/peerOrganizations/revenue.gouv.sn/msp
+    Policies:
+      Readers: { Type: Signature, Rule: "OR('NationalRevenueMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('NationalRevenueMSP.member')" }
+      Admins:  { Type: Signature, Rule: "OR('NationalRevenueMSP.admin')" }
+
+  - &CivilSociety
+    Name: CivilSocietyMSP
+    ID: CivilSocietyMSP
+    MSPDir: crypto-config/peerOrganizations/observer.dakar.sn/msp
+    Policies:
+      Readers: { Type: Signature, Rule: "OR('CivilSocietyMSP.member')" }
+      Writers: { Type: Signature, Rule: "OR('CivilSocietyMSP.admin')" }
+      Admins:  { Type: Signature, Rule: "OR('CivilSocietyMSP.admin')" }
+
+Capabilities:
+  Channel: &ChannelCapabilities { V2_0: true }
+  Orderer: &OrdererCapabilities { V2_0: true }
+  Application: &ApplicationCapabilities { V2_0: true }
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
+    Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
+    Admins:  { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
+  Capabilities: *ApplicationCapabilities
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers: { Type: ImplicitMeta, Rule: "ANY Readers" }
+    Writers: { Type: ImplicitMeta, Rule: "ANY Writers" }
+    Admins:  { Type: ImplicitMeta, Rule: "MAJORITY Admins" }
+  Capabilities: *ChannelCapabilities
+
+Profiles:
+  DakarCadastreGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      OrdererType: etcdraft
+      Addresses: [orderer.dakar.sn:7050]
+      EtcdRaft:
+        Consenters:
+          - Host: orderer.dakar.sn
+            Port: 7050
+            ClientTLSCert: crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/tls/server.crt
+            ServerTLSCert: crypto-config/ordererOrganizations/dakar.sn/orderers/orderer.dakar.sn/tls/server.crt
+      Organizations: [*Municipality]
+      Capabilities: *OrdererCapabilities
+    Application:
+      <<: *ApplicationDefaults
+      Organizations: [*Municipality, *NationalRevenue, *CivilSociety]
+    Consortiums:
+      DakarConsortium:
+        Organizations: [*Municipality, *NationalRevenue, *CivilSociety]
